@@ -1,9 +1,14 @@
 ;!!! Все возможные спорные и непонятные моменты я постарался расписать в виде комментариев.
 
+
+
 section .data
 
 newline_char: db 10
 numbers: db '0123456789', 0
+
+%define stderr 2
+%define stdout 1
 
 section .text
 
@@ -18,19 +23,30 @@ global exit
 ; Принимает код возврата и завершает текущий процесс
 exit:
     mov     rax, 60
-    mov     rdi, 0
     syscall
+
+; Принимает указатель на нуль-терминированную строку, выводит её в stdout
+print_string:
+    mov rsi, stdout
+    jmp print_in_stream
+
 
 ; Выводит данные в поток ошибок
 print_error:
-    push rdi
+    mov rsi, stderr
+
+; Принимает указатель на строку и поток, в который выводить строку
+print_in_stream:
     call string_length
+    push rdi
+    push rsi
+    pop rdi
     pop rsi
     mov rdx, rax
     mov rax, 1
-    mov rdi, 2 
     syscall
     ret
+
 
 ; Выводит беззнаковое 8-байтовое число в десятичном формате
 ; Совет: выделите место в стеке и храните там результаты деления
@@ -254,17 +270,6 @@ read_word:
         mov rax, r10
         mov rdx, r11
         ret
-
-; Принимает указатель на нуль-терминированную строку, выводит её в stdout
-print_string:
-    push rdi
-    call string_length
-    pop rsi
-    mov rdx, rax
-    mov rax, 1
-    mov rdi, 1
-    syscall
-    ret
 
 ; Принимает код символа и выводит его в stdout
 print_char:

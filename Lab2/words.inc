@@ -1,3 +1,7 @@
+%include "colon.inc"
+
+section .data
+
 colon "one", first
 db "Never gonna give you up", 0
 

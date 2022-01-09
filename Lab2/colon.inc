@@ -1,7 +1,7 @@
 %define next 0
-%macro colon 2
-    %2:	
-	dq next 
+%macro colon 2	
+	%%next: dq next
     	db %1, 0
-%define next %2
+	%2: 
+%define next %%next
 %endmacro

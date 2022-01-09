@@ -1,20 +1,16 @@
-AFLAGS=-felf64
-ASM=nasm
-
-all: main
-
-main: main.o dict.o lib.o
-	ld -o main main.o dict.o lib.o
+dic: 	main.o dict.o lib.o
+		ld -o dic main.o dict.o lib.o
 
 main.o: main.asm colon.inc words.inc
-	$(ASM) $(AFLAGS) main.asm
-
-lib.o: lib.asm 
-	$(ASM) $(AFLAGS) lib.asm
+		nasm -felf64 main.asm
 
 dict.o: dict.asm 
-	$(ASM) $(AFLAGS) dict.asm
+		nasm -felf64 dict.asm
 
+lib.o: 	lib.asm 
+		nasm -felf64 lib.asm
+
+.PHONY: clean
 
 clean:
-	rm -f main.o lib.o dict.o main
+		rm -f *.o dic
