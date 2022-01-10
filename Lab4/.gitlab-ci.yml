@@ -1,0 +1,13 @@
+image: generic-c
+
+stages:
+  - test
+
+before_script:
+  - apt install -y gcc
+
+test:
+  stage: test
+
+  script:
+    - make exec

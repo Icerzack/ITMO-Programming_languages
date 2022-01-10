@@ -15,6 +15,8 @@ void* _malloc( size_t query );
 void  _free( void* mem );
 void* heap_init( size_t initial_size );
 
+void* map_pages(void const* addr, size_t length, int additional_flags);
+
 #define DEBUG_FIRST_BYTES 4
 
 void debug_struct_info( FILE* f, void const* address );

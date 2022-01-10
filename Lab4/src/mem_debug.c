@@ -13,17 +13,22 @@ void debug_struct_info( FILE* f,
            header-> capacity.bytes,
            header-> is_free? "free" : "taken"
            );
-  for ( size_t i = 0; i < DEBUG_FIRST_BYTES && i < header -> capacity.bytes; ++i )
+           
+  for ( size_t i = 0; i < DEBUG_FIRST_BYTES && i < header -> capacity.bytes; ++i ){
     fprintf( f, "%hhX", header-> contents[i] );
+  }
   fprintf( f, "\n" );
+  
 }
 
 
 void debug_heap( FILE* f,  void const* ptr ) {
   fprintf( f, " --- Heap ---\n");
   fprintf( f, "%10s %10s %8s %10s\n", "start", "capacity", "status", "contents" );
-  for(struct block_header const* header =  ptr; header; header = header ->next )
+  for(struct block_header const* header =  ptr; header; header = header ->next ){
     debug_struct_info( f, header );
+  }
+    
 }
 
 void debug_block(struct block_header* b, const char* fmt, ... ) {
@@ -32,7 +37,7 @@ void debug_block(struct block_header* b, const char* fmt, ... ) {
   va_list args;
   va_start (args, fmt);
   vfprintf(stderr, fmt, args);
-  memalloc_debug_struct_info( stderr, b );
+  debug_struct_info( stderr, b );
   va_end (args);
 
   #else
