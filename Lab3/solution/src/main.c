@@ -28,8 +28,8 @@ int main(int argc, char** argv) {
                     struct image new_img = rotate(image);
                     enum output_state output_state = write_to_bmp_file(output_file, &new_img);
                     fprintf(stderr, "%s", write_state_message[output_state]);
-                    free_data(&new_img);
-                    free_data(&image);
+                    free(new_img.data);
+                    free(image.data);
                 }
                 fclose(input_file);
                 fclose(output_file);

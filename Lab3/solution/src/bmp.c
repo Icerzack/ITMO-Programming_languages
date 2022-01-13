@@ -1,12 +1,11 @@
 #include "bmp.h"
 #include "img_operations.h"
 // Заголовки bmp файла
-
-static uint32_t BI_SIZE = 40;
-static uint16_t BF_TYPE = 0x4d42;
-static uint16_t BI_BIT_COUNT = 24;
-static uint16_t BI_PLANES = 1;
-static uint32_t HEADER_SIZE = 54;
+uint32_t BI_SIZE = 40;
+uint16_t BF_TYPE = 0x4d42;
+uint16_t BI_BIT_COUNT = 24;
+uint16_t BI_PLANES = 1;
+uint32_t HEADER_SIZE = 54;
 
 // Сама структура
 
@@ -31,11 +30,11 @@ struct __attribute__((packed)) bmp_header {
 // Методы для работы с изображением
 
 static uint32_t get_size(uint32_t width, uint32_t height, uint32_t padding) {
-    return (width * height * 3 + padding*height);
+    return (width * height * sizeof(struct pixel) + padding * height);
 }
 
 static uint32_t get_padding(uint32_t width) {
-    const uint32_t width_bytes = 3 * width;
+    uint32_t width_bytes = sizeof(struct pixel) * width;
     if (width_bytes % 4 == 0) {
         return 0;
     }
@@ -60,9 +59,9 @@ static enum input_state check_header(struct bmp_header* header) {
 }
 
 static enum input_state read_img_data(FILE* file, struct image* img) {
-    const uint32_t width = img->width;
-    const uint32_t height = img->height;
-    const uint32_t padding = get_padding(width);
+    uint32_t width = img->width;
+    uint32_t height = img->height;
+    uint32_t padding = get_padding(width);
     if (width == 0 || height == 0){
         return READ_ERR;
     }
@@ -87,7 +86,7 @@ static enum input_state read_img_data(FILE* file, struct image* img) {
 // Методы для записи заголовка
 
 static enum output_state write_header(FILE* file, uint32_t width, uint32_t height, uint32_t padding) {
-    const uint32_t data_size = get_size(width, height, padding);
+    uint32_t data_size = get_size(width, height, padding);
     struct bmp_header header = {
         .bfType = BF_TYPE,
         .bfileSize = HEADER_SIZE + data_size,
@@ -116,7 +115,7 @@ static enum output_state write_img_data(FILE* file, uint32_t width, uint32_t hei
     for (size_t i=0; i<height; i++) {
         size_t pixels = fwrite(pointer, sizeof(struct pixel), width, file);
         size_t paddings = fwrite(pointer, padding, 1, file);
-        if ((pixels != width) || (paddings != 1)) {
+        if ((pixels != width) || (paddings != 1 && padding != 0) || (paddings !=0 && padding == 0)) {
             return WRITE_ERR;
         }
         pointer = pointer + width;
@@ -139,9 +138,9 @@ enum input_state read_from_bmp_file(FILE* input, struct image* img){
 }
 
 enum output_state write_to_bmp_file(FILE* output, struct image const* img) {
-    const uint32_t height = img_get_height(img);
-    const uint32_t width = img_get_width(img);
-    const uint32_t padding = get_padding(width);
+    uint32_t width = img->width;
+    uint32_t height = img->height;
+    uint32_t padding = get_padding(width);
     enum output_state header_state = write_header(output, width, height, padding);
     if (header_state == WRITE_OK) {
         header_state = write_img_data(output, width, height, padding, img->data);
