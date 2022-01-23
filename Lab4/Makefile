@@ -1,4 +1,4 @@
-CFLAGS=--std=c17 -Wall -pedantic -Isrc/ -ggdb -Wextra  -DDEBUG
+CFLAGS=--std=c17 -Wall -pedantic -Isrc/ -ggdb -Wextra -Werror  -DDEBUG
 BUILDDIR=build
 SRCDIR=src
 CC=gcc
@@ -12,6 +12,7 @@ build:
 
 exec: all
 	./$(BUILDDIR)/lab4
+	test
 
 $(BUILDDIR)/test.o: $(SRCDIR)/test.c build
 	$(CC) -c $(CFLAGS) $< -o $@
@@ -28,6 +29,8 @@ $(BUILDDIR)/mem_debug.o: $(SRCDIR)/mem_debug.c build
 $(BUILDDIR)/util.o: $(SRCDIR)/util.c build
 	$(CC) -c $(CFLAGS) $< -o $@
 
+test:
+	@+cd tester; make CC=$(CC)
+
 clean:
 	rm -rf $(BUILDDIR)
-
